@@ -13,28 +13,66 @@
  * 输入: num1 = "123", num2 = "456"
  * 输出: "56088"
  * -----------------------------------------------------------------------------
- * 复杂度O(n)   2020-03-21
+ * 复杂度O(n*m)   2020-03-22
  */
+#include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 class Solution {
     public:
+        string add(string const& b, string const& a, int i=0);
+        string multi(string const& b, char a);
         string multiply(string num1, string num2) {
-            int i = 0, j = 0;
-            for (auto it = num1.begin(); it < num1.end(); ++it)
-                i = i * 10 + (int) *it - 48;
-            for (auto it = num2.begin(); it < num2.end(); ++it)
-                j = j * 10 + (int) *it - 48;
-            i *= j;
-            if (i == 0) return "0";
-            string stk;
-            while (0 < i) {
-                stk.push_back((char) (i % 10 + 48));
-                i /= 10;
-            }
-            string ret = string(stk.rbegin(), stk.rend());
-            return ret;
-        }
+            reverse(num1.begin(), num1.end());
+            reverse(num2.begin(), num2.end());
+            vector<string> stk;
+            for (char c: num2)
+                stk.push_back(multi(num1, c));
+            string res;
+            for (int i = 0; i < stk.size(); ++i)
+                res = add(res, stk[i], i);
+            if (all_of(res.begin(), res.end(), [](char c) {return c=='0';}))
+                return "0";
+            reverse(res.begin(), res.end());
+            return res;
+        };
 };
+
+string Solution::add(string const& b, string const& a, int i) {
+    string res(b, 0, i); int m, n = 0;
+    for (int j = 0; j < a.size(); ++j, ++i) {
+        char c = (i < b.size())? b[i]: '0';
+        m = (c - 48) + (a[j] - 48) + n;
+        res.push_back((char) (m % 10 + 48));
+        n = m / 10;
+    }
+    if (0 < n)
+        res.push_back((char) (n + 48));
+    return res;
+}
+
+string Solution::multi(string const& b, char a) {
+    string res; int m, n = 0;
+    for (auto c: b) {
+        m = (int) ((c - 48) * (a - 48) + n);
+        res.push_back((char) (m % 10 + 48));
+        n = m / 10;
+    }
+    if (0 < n)
+        res.push_back((char) (n + 48));
+    return res;
+}
+
+int main() {
+    Solution s;
+    cout << s.add("13579", "02468", 0) << endl;
+    cout << s.add("1", "02468", 2) << endl;
+    cout << s.multi("1009", '5') << endl;
+    cout << s.multiply("1009", "1234") << endl;
+    cout << s.multiply("00", "0") << endl;
+    return 0;
+}
 
