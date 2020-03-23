@@ -6,13 +6,12 @@ using namespace std;
 void printResult(vector<vector<int>> v);
 
 int main() {
-    Solution s;
     auto v = vector<int>({1});
-    printResult(s.permute(v));
+    printResult(Solution().permute(v));
     v = vector<int>({1, 2, 3});
-    printResult(s.permute(v));
+    printResult(Solution().permute(v));
     v = vector<int>({1, 2, 3, 4});
-    printResult(s.permute(v));
+    printResult(Solution().permute(v));
 }
 
 void printResult(vector<vector<int>> vv) {

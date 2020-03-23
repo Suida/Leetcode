@@ -1,47 +1,53 @@
 /*
- * #45 --- 跳跃游戏II
- * 难度: 中等
+ * #46 --- Full Permutation
+ * Difficulty: Medium
  * -----------------------------------------------------------------------------
- * 给定一个非负整数数组，你最初位于数组的第一个位置。
- * 数组中的每个元素代表你在该位置可以跳跃的最大长度。
- * 你的目标是使用最少的跳跃次数到达数组的最后一个位置。
+ * Given a non-repeating integer sequence, calculate all the 
+ * possible arrangements and return them in a 2-dimensional sequence
  * ----------------------------------
- * 示例:
- * 输入: [2,3,1,1,4]
- * 输出: 2
- * 解释: 跳到最后一个位置的最小跳跃数是 2。
- *     从下标为 0 跳到下标为 1 的位置，跳1步，然后跳3步到达数组的最后一个位置。
+ * Examples:
+ * Input: [1, 2, 3]
+ * Output: 
+ * [
+ *     [ 1 2 3  ]
+ *     [ 1 3 2  ]
+ *     [ 2 1 3  ]
+ *     [ 2 3 1  ]
+ *     [ 3 1 2  ]
+ *     [ 3 2 1  ]
+ * ]
  * -----------------------------------------------------------------------------
  * Leetcode Rank:
- *      Speed:   95.09%
- *      Mem:    100.00%
- * 复杂度O(n)   2020-03-23
+ *      Speed:   90.19%
+ *      Mem:     28.62%
+ * O(n!)   2020-03-23
  */
+#include <set>
 #include <vector>
 using namespace std;
 
 class Solution {
+    vector<vector<int>> res;
+    vector<int> hot;
+    set<int> used;
     public:
-        void backtrace(vector<int> const& b, vector<int> const& a,
-                vector<vector<int>>& v)
-        {
-            if (b.empty()) {
-                v.push_back(a);
-                return;
-            }
-            for (int i=0; i<b.size(); ++i) {
-                vector<int> aa(a);
-                vector<int> bb(b);
-                aa.push_back(b[i]);
-                bb.erase(bb.begin()+i);
-                backtrace(bb, aa, v);
-            }
-            return;
+        void backtrace(vector<int> const& nums) {
+            if (hot.size() == nums.size())
+                res.push_back(vector<int>(hot));
+            else
+                for (int i=0; i<nums.size(); ++i) {
+                    if (used.find(i) == used.end()) {
+                        hot.push_back(nums[i]);
+                        used.insert(i);
+                        backtrace(nums);
+                        hot.pop_back();
+                        used.erase(i);
+                    }
+                }
         }
 
         vector<vector<int>> permute(vector<int>& nums) {
-            vector<vector<int>> v;
-            backtrace(nums, vector<int>(), v);
-            return v;
+            backtrace(nums);
+            return res;
         }
 };
