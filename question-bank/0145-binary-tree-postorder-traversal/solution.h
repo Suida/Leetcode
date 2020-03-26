@@ -1,3 +1,28 @@
+/*
+ * #145 --- Post-order Traversal of Binary Tree
+ * Difficulty: High
+ * -----------------------------------------------------------------------------
+ * Given a binary tree, return the result after post-order traversal.
+ * ----------------------------------
+ * Example:
+ * Input: 
+ *      7
+ *     / \
+ *    /   \
+ *   5     6
+ *  / \   / \
+ * 1   2 3   4
+ * Output: [ 1, 2, 5, 3, 4, 6, 7 ]
+ * Explanation: 
+ * Recursive solution is obvious, try iterate version.
+ * -----------------------------------------------------------------------------
+ * Leetcode Rank:
+ *      Speed:  100.00%     (0 ms)
+ *      Mem:    100.00%     (8.4 MB)
+ * -----------------------------------------------------------------------------
+ * O(n)         2020-03-26
+ */
+
 #include <vector>
 using namespace std;
 
