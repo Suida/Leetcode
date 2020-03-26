@@ -3,14 +3,14 @@
  * Difficulty: High
  * -----------------------------------------------------------------------------
  *  Given an array @nums and int @k, imagine there is a window which can contain
- *  @k numbers sliding along the array 1 number each time. Everytime the window
+ *  @k numbers sliding along the array 1 number each time. Every time the window
  *  has slidden, collect the maximum number inside the window into a
  *  `vector<int>` and return the vector.
  * ----------------------------------
- * Example:ss
+ * Example:
  * Input: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
  * Output: [3,3,5,5,6,7] 
- * Explaination: 
+ * Explanation: 
  *
  *   Position of Sliding Window   Maximum
  *   --------------------------    -----
