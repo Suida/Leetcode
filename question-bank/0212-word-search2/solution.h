@@ -24,77 +24,66 @@
  * Assume all characters are lowercase.
  * -----------------------------------------------------------------------------
  * Leetcode Rank:
- *      Speed:   23.11%
- *      Mem:     38.75%
+ *      Speed:   82.83%
+ *      Mem:     69.38%
  * -----------------------------------------------------------------------------
  * O(n!)         2020-03-26
  */
-#include <iostream>
 #include <vector>
 #include <string>
-#include "../0208-implement-trie/solution.h"
+#include <cstring>
 using namespace std;
 
 class Solution {
 private:
-    bool** seen;
+    struct Trie {
+        string word;
+        Trie* next[26];
+        Trie(): word("") { memset(next, 0, sizeof(next)); }
+    };
     vector<vector<char>> _board;
-    string word;
     vector<string> res;
-    Trie t;
     int xl;
     int yl;
 public:
-    void backtrace(int x, int y) {
-        if (!(0<=x && x<xl && 0<=y && y<yl)) return;
-        if (seen[x][y]) return;
-        word.push_back(_board[x][y]);
-        if (t.search(word)) {
-            bool found = false;
-            for (auto s: res)
-                if (s==word) found = true;
-            if (!found) res.push_back(word);
+    void backtrace(int x, int y, Trie* t) {
+        char c = _board[x][y];
+        if (c=='#' || t->next[c-'a']==nullptr) return;
+        Trie* next = t->next[c-'a'];
+        if (next->word != "") {
+            res.push_back(next->word);
+            next->word = "";
         }
-        if (t.startsWith(word)) {
-            seen[x][y] = true;
-            backtrace(x-1, y);
-            backtrace(x, y-1);
-            backtrace(x+1, y);
-            backtrace(x, y+1);
-            seen[x][y] = false;
-        }
-        word.pop_back();
-        return;
+        _board[x][y] = '#';
+        if (0<x) backtrace(x-1, y, next);
+        if (0<y) backtrace(x, y-1, next);
+        if (x<xl-1) backtrace(x+1, y, next);
+        if (y<yl-1) backtrace(x, y+1, next);
+        _board[x][y] = c;
     }
 
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
         if (board.empty()) return res;
         this->_board = board;
-        for (auto s: words)
-            t.insert(s);
+        Trie* t = buildTrie(words);
         xl = board.size();
         yl = board[0].size();
-        seen = new bool*[xl];
-        for (int x=0; x<xl; ++x) {
-            seen[x] = new bool[yl];
-            for (int y=0; y<yl; ++y)
-                seen[x][y] = false;
-        }
         for (int x=0; x<xl; ++x)
-            for (int y=0; y<yl; ++y) backtrace(x, y);
+            for (int y=0; y<yl; ++y) backtrace(x, y, t);
+        return res;
+    }
+    
+    Trie* buildTrie(vector<string>& words) {
+        Trie* res = new Trie;
+        for (string s: words) {
+            Trie* t = res;
+            for (char c: s) {
+                if (!t->next[c-'a']) t->next[c-'a'] = new Trie;
+                t = t->next[c-'a'];
+            }
+            t->word = s;
+        }
         return res;
     }
 };
-
-int main() {
-    vector<string> words = {"oath","pea","eat","rain"};
-    vector<vector<char>> board = {
-        {'o','a','a','n'},
-        {'e','t','a','e'},
-        {'i','h','k','r'},
-        {'i','f','l','v'}
-    };
-    for (auto s: Solution().findWords(board, words))
-        cout << s << endl;
-}
 
