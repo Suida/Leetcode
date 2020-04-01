@@ -4,50 +4,71 @@
 #include <cstdio>
 using namespace std;
 
+struct Trie {
+    bool isEnd;
+    Trie** next;
+};
+
 class Solution {
 public:
-    bool starts_with(string s, string p) {
-        for (int i=0; i<p.size(); ++i) {
-            if (i == s.size()) return false;
-            if (s[i] != p[i]) return false;
-        }
-        return true;
-    }
-
     vector<string> wordBreak(string s, vector<string>& wordDict) {
-        int m = s.size(), n = wordDict.size();
-        int** dp = new int*[m+1] {};
-        for (int i=0; i<m+1; ++i) dp[i] = new int[n] {};
-        dp[0][0] = 1;
-        string w, sfx;
-        // 看起来是 O(n*m*m), 实际上是 O(n*m)
+        int m = s.size();
+        Trie* root = &buildTrie(wordDict), *cur;
+        vector<vector<string>> dp;
+        for (int i=0; i<m+1; ++i) {
+            dp.push_back(vector<string> {});
+        }
+        dp[0].push_back("");
         for (int i=0; i<m; ++i) {
-            for (int j=0; j<n; ++j) {
-                if (dp[i][j] == 0) continue;
-                for (int k=0; k<n; ++k) {
-                    w = wordDict[k];
-                    sfx = s.substr(i);
-                    if (starts_with(sfx, w)) {
-                        dp[i+w.size()][k] = 1;
-                    }
+            if (dp[i].empty()) continue;
+            cur = root;
+            for (int j=i; j<m+1; ++j) {
+                if (cur->isEnd) {
+                    dp[j].push_back(s.substr(i, j-i));
                 }
-                j = n;
+                if (cur->next[s[j]-'a'] && j != m) {
+                    cur = cur->next[s[j]-'a'];
+                    continue;
+                }
+                break;
             }
         }
-        return dfs(dp, m, n, wordDict);
+        return dfs(dp, m);
     }
 
-    vector<string> dfs(int** dp, int i, int n, vector<string> const& words) {
-        if (i == 0) return {""};
+    vector<string> dfs(vector<vector<string>> const& dp, int i) {
         vector<string> res;
-        for (int j=0; j<n; ++j) {
-            if (dp[i][j] == 0) continue;
-            for (auto s: dfs(dp, i-words[j].size(), n, words)) {
-                s = (s == "")? words[j]: s + " " + words[j];
-                res.push_back(s);
+        int j;
+        for (auto& w: dp[i]) {
+            j = i - w.size();
+            if (j == 0) {
+                res.push_back(w);
+                continue;
+            }
+            for (auto sfx: dfs(dp, j)) {
+                res.push_back(sfx + " " + w);
             }
         }
         return res;
+    }
+
+    Trie& buildTrie(vector<string> const& words) {
+        Trie* root = new Trie, *cur;
+        root->isEnd = false;
+        root->next = new Trie*[26] { nullptr };
+        for (auto& w: words) {
+            cur = root;
+            for (auto c: w) {
+                if (cur->next[c-'a'] == nullptr) {
+                    cur->next[c-'a'] = new Trie;
+                    cur->next[c-'a']->isEnd = false;
+                    cur->next[c-'a']->next = new Trie*[26] { nullptr };
+                }
+                cur = cur->next[c-'a'];
+            }
+            cur->isEnd = true;
+        }
+        return *root;
     }
 };
 
